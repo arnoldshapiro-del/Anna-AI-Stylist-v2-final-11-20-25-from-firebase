@@ -1,22 +1,78 @@
-import type { Handler } from "@netlify/functions";
-import { GoogleGenerativeAI } from "@google/genai";
+// netlify/functions/gemini.ts
+// Self-contained Netlify function that calls Google's Generative Language REST API directly.
+// No npm packages required. Works with GEMINI_API_KEY and optional GEMINI_MODEL env vars.
 
-const API_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-
-export const handler: Handler = async (event) => {
+export const handler = async (event: any) => {
   try {
-    if (!API_KEY) throw new Error("Missing GEMINI_API_KEY");
+    const API_KEY =
+      process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+
+    if (!API_KEY) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Missing GEMINI_API_KEY (set in Netlify → Site settings → Environment variables).",
+        }),
+      };
+    }
+
+    // read prompt from POST body
     const body = event.body ? JSON.parse(event.body) : {};
-    const prompt = body.prompt ?? "ping";
+    const prompt = body.prompt || "ping";
 
-    const genAI = new GoogleGenerativeAI({ apiKey: API_KEY });
-    const model = genAI.getGenerativeModel({ model: MODEL });
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    // Google AI Studio REST endpoint (text)
+    const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${API_KEY}`;
 
-    return { statusCode: 200, body: JSON.stringify({ text }) };
+    const payload = {
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: String(prompt) }],
+        },
+      ],
+    };
+
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      // Bubble up Google error details so you can see them in the browser console
+      return {
+        statusCode: resp.status,
+        body: JSON.stringify({
+          error:
+            (data && data.error && data.error.message) ||
+            "Gemini request failed",
+          meta: data,
+        }),
+      };
+    }
+
+    // Extract text safely
+    const text =
+      (data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].content &&
+        Array.isArray(data.candidates[0].content.parts) &&
+        data.candidates[0].content.parts
+          .map((p: any) => p?.text || "")
+          .join("")) ||
+      "";
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ text }),
+    };
   } catch (err: any) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message || "Gemini error" }) };
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: String(err) }),
+    };
   }
 };
