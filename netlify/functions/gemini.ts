@@ -5,15 +5,15 @@
 // - Returns a standard JSON object { text, isSvg }
 
 const SVG_INSTRUCTIONS = `
-TASK: Generate a complete, valid, single-file SVG representing the user\'s prompt.
+TASK: Generate a complete, valid, single-file SVG representing the user's prompt.
 RULES:
-- Return ONLY the SVG code, starting with an opening `<svg>` tag and ending with a closing `<\/svg>` tag.
+- Return ONLY the SVG code itself.
 - DO NOT include the string "svg" anywhere before the opening tag.
 - DO NOT wrap the output in Markdown backticks or any other text.
 - The SVG should be a single, self-contained file.
 - Use a square aspect ratio (e.g., viewBox="0 0 512 512").
 - The design should be modern, clean, and visually appealing.
-- Embed styles directly in a `<style>` tag within the SVG.
+- Embed styles directly in a <style> tag within the SVG.
 - Use a rich but tasteful color palette.
 - The illustration should be detailed and high-quality.
 `;
@@ -84,7 +84,7 @@ PROMPT: ${prompt}`;
     // For SVGs, do a basic check and cleanup
     if (isImageRequest && !text.startsWith("<svg")) {
         // The model failed to follow instructions; return an error SVG
-        const errorSvg = `<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:sans-serif;font-size:16px;fill:red;text-anchor:middle;dominant-baseline:middle;}</style><text x="256" y="256">Error: AI failed to generate a valid SVG.</text><\/svg>`;
+        const errorSvg = `<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:sans-serif;font-size:16px;fill:red;text-anchor:middle;dominant-baseline:middle;}</style><text x="256" y="256">Error: AI failed to generate a valid SVG.</text></svg>`;
         return {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
