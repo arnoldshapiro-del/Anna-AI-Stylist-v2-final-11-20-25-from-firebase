@@ -5,9 +5,9 @@
 // - Returns a standard JSON object { text, isSvg }
 
 const SVG_INSTRUCTIONS = `
-TASK: Generate a complete, valid, single-file SVG representing the user'''s prompt.
+TASK: Generate a complete, valid, single-file SVG representing the user's prompt.
 RULES:
-- Return ONLY the SVG code, starting with `<svg...` and ending with `</svg>`.
+- Return ONLY the SVG code, starting with an opening `<svg>` tag and ending with a closing `</svg>` tag.
 - DO NOT include the string "svg" anywhere before the opening tag.
 - DO NOT wrap the output in Markdown backticks or any other text.
 - The SVG should be a single, self-contained file.

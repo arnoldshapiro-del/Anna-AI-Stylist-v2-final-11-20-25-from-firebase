@@ -1,6 +1,4 @@
-// src/lib/geminiClient.ts
 // This client handles communication with the Netlify serverless function.
-
 export async function generateText(prompt: string): Promise<{ text: string; isSvg: boolean }> {
   const res = await fetch("/.netlify/functions/gemini", {
     method: "POST",
@@ -16,7 +14,6 @@ export async function generateText(prompt: string): Promise<{ text: string; isSv
   }
 
   const data = await res.json();
-
   // The server returns { text, isSvg } on success.
   return {
     text: data.text || "",
