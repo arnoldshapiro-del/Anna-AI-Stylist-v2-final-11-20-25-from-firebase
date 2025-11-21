@@ -1,6 +1,6 @@
 // netlify/functions/gemini.ts
 // Multi-purpose Gemini function:
-// - Uses gemini-1.5-pro-latest for high-quality text.
+// - Uses gemini-1.5-pro for high-quality text.
 // - Detects "illustration" prompts and returns a generated SVG image string.
 // - Returns a standard JSON object { text, isSvg }
 
@@ -27,7 +27,7 @@ export const handler = async (event: any) => {
   try {
     const API_KEY =
       process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    const MODEL = "gemini-1.5-pro-latest";
+    const MODEL = "gemini-1.5-pro";
 
     if (!API_KEY) {
       throw new Error(
