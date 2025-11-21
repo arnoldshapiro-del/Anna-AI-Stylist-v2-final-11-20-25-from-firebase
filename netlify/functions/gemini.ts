@@ -1,11 +1,11 @@
 // netlify/functions/gemini.ts
 // Multi-purpose Gemini function:
-// - Uses gemini-1.5-pro for high-quality text.
+// - Uses gemini-3-pro-preview for high-quality text.
 // - Detects "illustration" prompts and returns a generated SVG image string.
 // - Returns a standard JSON object { text, isSvg }
 
 const SVG_INSTRUCTIONS = `
-TASK: Generate a complete, valid, single-file SVG representing the user's prompt.
+TASK: Generate a complete, valid, single-file SVG representing the user\'s prompt.
 RULES:
 - Return ONLY the SVG code itself.
 - DO NOT include the string "svg" anywhere before the opening tag.
@@ -19,7 +19,7 @@ RULES:
 `;
 
 const TEXT_INSTRUCTIONS = `
-You are a world-class AI fashion assistant (Gemini 1.5 Pro).
+You are a world-class AI fashion assistant (Gemini 3 Pro).
 Return clear, actionable results. Be concise and use short, scannable bullets.
 `;
 
@@ -27,7 +27,7 @@ export const handler = async (event: any) => {
   try {
     const API_KEY =
       process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    const MODEL = "gemini-1.5-pro";
+    const MODEL = "gemini-3-pro-preview";
 
     if (!API_KEY) {
       throw new Error(
